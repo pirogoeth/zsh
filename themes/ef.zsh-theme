@@ -12,7 +12,7 @@ if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="cyan"; fi
 # prompt
 EDGE_CHAR="%F{039}λ%f"
 PROMPT='[%{$fg[$NCOLOR]%}%n%{$reset_color%}:%{$fg[magenta]%}%30<...<%~%<<%{$reset_color%}]%(!.#. $EDGE_CHAR) '
-RPROMPT='$(git_prompt_info)'
+RPROMPT='$(git_prompt_info)$(virtualenv_prompt_info)'
 
 # git theming
 ZSH_THEME_GIT_PROMPT_PREFIX="%F{gray}( \u21cc %f%b%F{158}"
