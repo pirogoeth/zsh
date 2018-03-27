@@ -34,10 +34,10 @@ PROMPT='[%{$fg[$NCOLOR]%}%n%{$reset_color%}:%{$fg[magenta]%}%30<...<%~%<<%{$rese
 RPROMPT='$(git_prompt_info)$(virtualenv_prompt_info)'
 
 # git theming
-ZSH_THEME_GIT_PROMPT_PREFIX="%F{gray}( \u21cc %f%b%F{158}"
-ZSH_THEME_GIT_PROMPT_SUFFIX="%f%F{gray} )%f "
+ZSH_THEME_GIT_PROMPT_PREFIX="%F{gray}( \u21cc %f%B%F{158}"
+ZSH_THEME_GIT_PROMPT_SUFFIX="%f%b%F{gray} )%f "
 ZSH_THEME_GIT_PROMPT_CLEAN=""
 ZSH_THEME_GIT_PROMPT_DIRTY="%F{red} ✱ %f"
 
-ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX="%F{gray}( \u267b  %f%b%F{159}"
-ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX="%f%F{gray} )%f "
+ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX="%F{gray}( \u267b  %f%B%F{159}"
+ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX="%f%b%F{gray} )%f "
