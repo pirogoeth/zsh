@@ -12,6 +12,10 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX="("
 ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX=")"
 
+ZSH_THEME_SSH_PROMPT_PREFIX="["
+ZSH_THEME_SSH_PROMPT_SUFFIX="%f]|"
+ZSH_THEME_SSH_PROMPT_TITLE="%F{red}SSH: %F{gray}"
+
 function virtualenv_prompt_info() {
     if [ -n "$VIRTUAL_ENV" ]; then
         if [ -f "$VIRTUAL_ENV/__name__" ]; then
@@ -25,12 +29,19 @@ function virtualenv_prompt_info() {
     fi
 }
 
+function ssh_prompt_info() {
+    if [ -n "$SSH_CONNECTION" ]; then
+        local shortname=$(hostname --short)
+        echo "${ZSH_THEME_SSH_PROMPT_PREFIX}${ZSH_THEME_SSH_PROMPT_TITLE} ${shortname}${ZSH_THEME_SSH_PROMPT_SUFFIX}"
+    fi
+}
+
 # if superuser make the username blue
 if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="cyan"; fi
 
 # prompt
 EDGE_CHAR="%F{039}λ%f"
-PROMPT='[%{$fg[$NCOLOR]%}%n%{$reset_color%}:%{$fg[magenta]%}%30<...<%~%<<%{$reset_color%}]%(!.#. $EDGE_CHAR) '
+PROMPT='$(ssh_prompt_info)[%{$fg[$NCOLOR]%}%n%{$reset_color%}:%{$fg[magenta]%}%30<...<%~%<<%{$reset_color%}]%(!.#. $EDGE_CHAR) '
 RPROMPT='$(git_prompt_info)$(virtualenv_prompt_info)'
 
 # git theming
@@ -41,3 +52,4 @@ ZSH_THEME_GIT_PROMPT_DIRTY="%F{red} ✱ %f"
 
 ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX="%F{gray}( \u267b  %f%B%F{159}"
 ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX="%f%b%F{gray} )%f "
+
