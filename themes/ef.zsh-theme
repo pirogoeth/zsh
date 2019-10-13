@@ -5,9 +5,14 @@
 #  path is autoshortened to ~30 characters
 #  displays git status (if applicable in current folder)
 #  displays current virtualenv (if activated)
+#  displays current knife block in use (if available)
+#    will only search up to ${ZSH_THEME_FIND_UPWARDS_MAX:-3} directories above current
+#    requires `miscutils` installed: `cargo install --git https://glow.dev.maio.me/seanj/miscutils.git`
 #  turns username red if superuser, otherwise it is blue
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+ZSH_THEME_FIND_UPWARDS_MAX=${ZSH_THEME_FIND_UPWARDS_MAX:-5}
 
 ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX="("
 ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX=")"
@@ -15,6 +20,30 @@ ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX=")"
 ZSH_THEME_SSH_PROMPT_PREFIX="["
 ZSH_THEME_SSH_PROMPT_SUFFIX="%f]|"
 ZSH_THEME_SSH_PROMPT_TITLE="%F{red}SSH: %F{gray}"
+
+ZSH_THEME_KNIFE_BLOCK_PREFIX="["
+ZSH_THEME_KNIFE_BLOCK_SUFFIX="%f]|"
+ZSH_THEME_KNIFE_BLOCK_TITLE="🔪%F{blue}:"
+
+function knife_block_prompt_info() {
+    if [ ! $commands[mu] ] ; then
+        return
+    fi
+
+    # `mu find-upwards` will canonicalize all paths before returning them, meaning
+    # we will not need to deal with resolving paths.
+    local chef_dir=$(mu find-upwards --max-depth="${ZSH_THEME_FIND_UPWARDS_MAX}" ".chef")
+    if [ ! -z "${chef_dir}" ] ; then
+        local current_block="${chef_dir}/knife.rb"
+        if [ -f "${current_block}" ] ; then
+            # `current_block` will be something like: /Path/to/.chef/knife-environment.rb
+            local current_block=$(basename "${current_block}")
+            current_block=${current_block#knife-}
+            current_block=${current_block%.rb}
+            echo "${ZSH_THEME_KNIFE_BLOCK_PREFIX}${ZSH_THEME_KNIFE_BLOCK_TITLE}${current_block}${ZSH_THEME_KNIFE_BLOCK_SUFFIX}"
+        fi
+    fi
+}
 
 function virtualenv_prompt_info() {
     if [ -n "$VIRTUAL_ENV" ]; then
@@ -41,7 +70,7 @@ if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="cyan"; fi
 
 # prompt
 EDGE_CHAR="%F{039}λ%f"
-PROMPT='$(ssh_prompt_info)[%{$fg[$NCOLOR]%}%n%{$reset_color%}:%{$fg[magenta]%}%30<...<%~%<<%{$reset_color%}]%(!.#. $EDGE_CHAR) '
+PROMPT='$(ssh_prompt_info)[%{$fg[$NCOLOR]%}%n%{$reset_color%}:%{$fg[magenta]%}%30<...<%~%<<%{$reset_color%}]$(knife_block_prompt_info)%(!.#. $EDGE_CHAR) '
 RPROMPT='$(git_prompt_info)$(virtualenv_prompt_info)'
 
 # git theming
