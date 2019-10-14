@@ -25,6 +25,14 @@ ZSH_THEME_KNIFE_BLOCK_PREFIX="["
 ZSH_THEME_KNIFE_BLOCK_SUFFIX="%f]|"
 ZSH_THEME_KNIFE_BLOCK_TITLE="🔪%F{blue}:"
 
+function __readlink() {
+    local path="${1}"
+    [[ -z "${path}" ]] && return 1;
+    [[ ! -e "${path}" ]] && return 127;
+    [[ ! -L "${path}" ]] && echo "${path}" && return 0;
+    echo ${path}(:A)
+}
+
 function knife_block_prompt_info() {
     if [ ! $commands[mu] ] ; then
         return
@@ -35,8 +43,9 @@ function knife_block_prompt_info() {
     local chef_dir=$(mu find-upwards --max-depth="${ZSH_THEME_FIND_UPWARDS_MAX}" ".chef")
     if [ ! -z "${chef_dir}" ] ; then
         local current_block="${chef_dir}/knife.rb"
-        if [ -f "${current_block}" ] ; then
+        if [ -e "${current_block}" ] ; then
             # `current_block` will be something like: /Path/to/.chef/knife-environment.rb
+            local current_block=$(__readlink "${current_block}")
             local current_block=$(basename "${current_block}")
             current_block=${current_block#knife-}
             current_block=${current_block%.rb}
