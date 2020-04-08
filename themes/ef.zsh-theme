@@ -25,6 +25,10 @@ ZSH_THEME_KNIFE_BLOCK_PREFIX="["
 ZSH_THEME_KNIFE_BLOCK_SUFFIX="%f]"
 ZSH_THEME_KNIFE_BLOCK_TITLE="🔪%F{blue}:"
 
+ZSH_THEME_ENVMGR_BLOCK_PREFIX="["
+ZSH_THEME_ENVMGR_BLOCK_SUFFIX="%f]"
+ZSH_THEME_ENVMGR_BLOCK_TITLE="🌲%F{green}:"
+
 function __readlink() {
     local path="${1}"
     [[ -z "${path}" ]] && return 1;
@@ -54,9 +58,18 @@ function knife_block_prompt_info() {
     fi
 }
 
+function envmgr_prompt_info() {
+    if [ ! $commands[envmgr] ] ; then
+        return
+    fi
+
+    if [ -n "$ENVMGR_NAME" ] ; then
+        echo "$ZSH_THEME_ENVMGR_BLOCK_PREFIX$ZSH_THEME_ENVMGR_BLOCK_TITLE$ENVMGR_NAME$ZSH_THEME_ENVMGR_BLOCK_SUFFIX"
+    fi
+
 function virtualenv_prompt_info() {
-    if [ -n "$VIRTUAL_ENV" ]; then
-        if [ -f "$VIRTUAL_ENV/__name__" ]; then
+    if [ -n "$VIRTUAL_ENV" ] ; then
+        if [ -f "$VIRTUAL_ENV/__name__" ] ; then
             local name=`cat $VIRTUAL_ENV/__name__`
         elif [ `basename $VIRTUAL_ENV` = "__" ]; then
             local name=$(basename $(dirname $VIRTUAL_ENV))
@@ -79,7 +92,7 @@ if [ $UID -eq 0 ]; then NCOLOR="red"; else NCOLOR="cyan"; fi
 
 # prompt
 EDGE_CHAR="%F{039}λ%f"
-PROMPT='$(ssh_prompt_info)[%{$fg[$NCOLOR]%}%n%{$reset_color%}:%{$fg[magenta]%}%30<...<%~%<<%{$reset_color%}]$(knife_block_prompt_info)%(!.#. $EDGE_CHAR) '
+PROMPT='$(ssh_prompt_info)$(envmgr_prompt_info)[%{$fg[$NCOLOR]%}%n%{$reset_color%}:%{$fg[magenta]%}%30<...<%~%<<%{$reset_color%}]$(knife_block_prompt_info)%(!.#. $EDGE_CHAR) '
 RPROMPT='$(git_prompt_info)$(virtualenv_prompt_info)'
 
 # git theming
