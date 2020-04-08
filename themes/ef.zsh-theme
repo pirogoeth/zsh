@@ -12,23 +12,6 @@
 
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 
-ZSH_THEME_FIND_UPWARDS_MAX=${ZSH_THEME_FIND_UPWARDS_MAX:-5}
-
-ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX="("
-ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX=")"
-
-ZSH_THEME_SSH_PROMPT_PREFIX="["
-ZSH_THEME_SSH_PROMPT_SUFFIX="%f]"
-ZSH_THEME_SSH_PROMPT_TITLE="%F{red}SSH: %F{gray}"
-
-ZSH_THEME_KNIFE_BLOCK_PREFIX="["
-ZSH_THEME_KNIFE_BLOCK_SUFFIX="%f]"
-ZSH_THEME_KNIFE_BLOCK_TITLE="🔪%F{blue}:"
-
-ZSH_THEME_ENVMGR_BLOCK_PREFIX="["
-ZSH_THEME_ENVMGR_BLOCK_SUFFIX="%f]"
-ZSH_THEME_ENVMGR_BLOCK_TITLE="🌲%F{green}:"
-
 function __readlink() {
     local path="${1}"
     [[ -z "${path}" ]] && return 1;
@@ -42,9 +25,14 @@ function knife_block_prompt_info() {
         return
     fi
 
+    local prefix="["
+    local suffix="%f]"
+    local title="🔪%F{blue}:"
+    local find_upwards_max=${ZSH_THEME_FIND_UPWARDS_MAX:-5}
+
     # `mu find-upwards` will canonicalize all paths before returning them, meaning
     # we will not need to deal with resolving paths.
-    local chef_dir=$(mu find-upwards --max-depth="${ZSH_THEME_FIND_UPWARDS_MAX}" ".chef")
+    local chef_dir=$(mu find-upwards --max-depth="${find_upwards_max}" ".chef")
     if [ ! -z "${chef_dir}" ] ; then
         local current_block="${chef_dir}/knife.rb"
         if [ -e "${current_block}" ] ; then
@@ -53,7 +41,7 @@ function knife_block_prompt_info() {
             local current_block=$(basename "${current_block}")
             current_block=${current_block#knife-}
             current_block=${current_block%.rb}
-            echo "${ZSH_THEME_KNIFE_BLOCK_PREFIX}${ZSH_THEME_KNIFE_BLOCK_TITLE}${current_block}${ZSH_THEME_KNIFE_BLOCK_SUFFIX}"
+            echo "${prefix}${title}${current_block}${suffix}"
         fi
     fi
 }
@@ -63,27 +51,39 @@ function envmgr_prompt_info() {
         return
     fi
 
+    local prefix="["
+    local suffix="%f]"
+    local title="🌲%F{green}:"
+
     if [ -n "$ENVMGR_NAME" ] ; then
-        echo "$ZSH_THEME_ENVMGR_BLOCK_PREFIX$ZSH_THEME_ENVMGR_BLOCK_TITLE$ENVMGR_NAME$ZSH_THEME_ENVMGR_BLOCK_SUFFIX"
+        echo "$prefix$title$ENVMGR_NAME$suffix"
     fi
+}
 
 function virtualenv_prompt_info() {
+    local prefix="("
+    local suffix=")"
+
     if [ -n "$VIRTUAL_ENV" ] ; then
         if [ -f "$VIRTUAL_ENV/__name__" ] ; then
             local name=`cat $VIRTUAL_ENV/__name__`
-        elif [ `basename $VIRTUAL_ENV` = "__" ]; then
+        elif [ `basename $VIRTUAL_ENV` = "__" ] ; then
             local name=$(basename $(dirname $VIRTUAL_ENV))
         else
             local name=$(basename $VIRTUAL_ENV)
         fi
-        echo "$ZSH_THEME_VIRTUAL_ENV_PROMPT_PREFIX$name$ZSH_THEME_VIRTUAL_ENV_PROMPT_SUFFIX"
+        echo "$prefix$name$suffix"
     fi
 }
 
 function ssh_prompt_info() {
-    if [ -n "$SSH_CONNECTION" ]; then
+    local prefix="["
+    local suffix="%f]"
+    local title="%F{red}SSH: %F{gray}"
+
+    if [ -n "$SSH_CONNECTION" ] ; then
         local shortname=$(hostname --short)
-        echo "${ZSH_THEME_SSH_PROMPT_PREFIX}${ZSH_THEME_SSH_PROMPT_TITLE} ${shortname}${ZSH_THEME_SSH_PROMPT_SUFFIX}"
+        echo "${prefix}${title}${shortname}${suffix}"
     fi
 }
 
